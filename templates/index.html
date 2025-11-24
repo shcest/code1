@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학원 출석부</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏫 학원 출석부</h1>
+        </header>
+
+        <div class="main-content">
+            <!-- 학생 관리 섹션 -->
+            <section class="section">
+                <h2>학생 관리</h2>
+                <div class="form-group">
+                    <input type="text" id="studentName" placeholder="학생 이름" />
+                    <input type="text" id="studentPhone" placeholder="전화번호 (선택)" />
+                    <button onclick="addStudent()">학생 추가</button>
+                </div>
+
+                <div id="studentList" class="list-container">
+                    <h3>학생 목록</h3>
+                    <div id="students"></div>
+                </div>
+            </section>
+
+            <!-- 출석 체크 섹션 -->
+            <section class="section">
+                <h2>출석 체크</h2>
+                <div class="form-group">
+                    <input type="date" id="attendanceDate" />
+                    <select id="studentSelect">
+                        <option value="">학생 선택</option>
+                    </select>
+                    <select id="attendanceStatus">
+                        <option value="출석">출석</option>
+                        <option value="결석">결석</option>
+                        <option value="지각">지각</option>
+                    </select>
+                    <input type="text" id="attendanceNote" placeholder="메모 (선택)" />
+                    <button onclick="markAttendance()">출석 체크</button>
+                </div>
+
+                <div>
+                    <button onclick="showTodayAttendance()">오늘 출석 현황</button>
+                    <button onclick="showAllAttendance()">전체 출석 기록</button>
+                </div>
+            </section>
+
+            <!-- 출석 기록 섹션 -->
+            <section class="section">
+                <h2>출석 기록</h2>
+                <div id="attendanceRecords" class="list-container"></div>
+            </section>
+
+            <!-- 출석 통계 섹션 -->
+            <section class="section">
+                <h2>출석 통계</h2>
+                <div id="attendanceStats" class="stats-container"></div>
+            </section>
+        </div>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
