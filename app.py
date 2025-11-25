@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
 from database import get_db_connection, init_db
+from report_generator import generate_report, save_report
 from datetime import datetime
 import os
 
@@ -175,6 +176,74 @@ def get_attendance_stats():
     conn.close()
 
     return jsonify([dict(stat) for stat in stats])
+
+# Daily Study Report API
+@app.route('/api/report', methods=['POST'])
+def create_report():
+    """Daily Study Report를 생성합니다."""
+    data = request.get_json()
+
+    # 필수 필드 검증
+    name = data.get('name')
+    textbook = data.get('textbook')
+    progress = data.get('progress')
+
+    if not all([name, textbook, progress]):
+        return jsonify({'error': '학생 이름, 교재, 진도는 필수 항목입니다.'}), 400
+
+    # 보고서 데이터 구성
+    report_data = {
+        'name': name,
+        'textbook': textbook,
+        'progress': progress,
+        'homework': data.get('homework', ''),
+        'vocabulary': data.get('vocabulary', ''),
+        'reading': data.get('reading', ''),
+        'expression': data.get('expression', ''),
+        'grammar': data.get('grammar', ''),
+        'test': data.get('test', ''),
+        'notes': data.get('notes', '')
+    }
+
+    try:
+        # 보고서 생성
+        report_text = generate_report(report_data)
+        return jsonify({
+            'success': True,
+            'report': report_text,
+            'message': '보고서가 성공적으로 생성되었습니다.'
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/report/download', methods=['POST'])
+def download_report():
+    """생성된 보고서를 텍스트 파일로 다운로드합니다."""
+    data = request.get_json()
+    report_text = data.get('report', '')
+    student_name = data.get('name', 'student')
+
+    if not report_text:
+        return jsonify({'error': '보고서 내용이 없습니다.'}), 400
+
+    # 파일명 생성
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f"daily_report_{student_name}_{timestamp}.txt"
+
+    # 텍스트 파일로 응답
+    return Response(
+        report_text,
+        mimetype='text/plain',
+        headers={'Content-Disposition': f'attachment; filename={filename}'}
+    )
+
+
+@app.route('/report')
+def report_page():
+    """Daily Study Report 작성 페이지를 렌더링합니다."""
+    return render_template('report.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
