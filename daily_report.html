@@ -37,13 +37,11 @@
             <h1>Daily Study Report 작성기</h1>
             <p>학생 정보를 텍스트로 입력하면 AI가 자동으로 보고서를 생성합니다</p>
         </div>
-
         <div class="two-column">
             <div class="column">
                 <div class="card">
                     <h2>학생 정보 입력</h2>
-                    <div class="example">
-                        <div class="example-title">입력 예시</div>학생이름 홍길동
+                    <div class="example"><div class="example-title">입력 예시</div>학생이름 홍길동
 교재 Orange 8
 진도 Day 7
 과제 완료
@@ -62,7 +60,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="column">
                 <div id="resultSection" class="card result-section">
                     <h2>생성된 보고서</h2>
@@ -76,233 +73,387 @@
             </div>
         </div>
     </div>
-
 <script>
-const PRAISE={excellent:["{name} 학생이 오늘 수업에서 정말 열심히 참여하는 모습이 인상적이었습니다.","수업 시간 내내 집중력을 잃지 않고 적극적으로 학습에 임하였습니다.","선생님의 질문에 자신감 있게 대답하는 모습에서 큰 성장을 느꼈습니다.","어려운 문제도 포기하지 않고 끝까지 도전하는 자세가 훌륭했습니다.","배운 내용을 빠르게 이해하고 응용하는 능력이 뛰어납니다.","문장 구조를 정확히 파악하고 올바르게 활용하는 모습이 대견했습니다."],good:["{name} 학생이 오늘 수업에 성실하게 참여하였습니다.","꾸준히 노력하는 모습이 보여 앞으로의 성장이 기대됩니다.","수업 내용을 이해하려고 집중하는 자세가 좋았습니다.","실수를 두려워하지 않고 도전하는 용기가 대단합니다.","조금씩이지만 꾸준한 발전을 보이고 있습니다."],needs:["{name} 학생이 오늘 수업에서 최선을 다해 참여하였습니다.","어려운 내용에도 포기하지 않고 끝까지 함께 해주어 고마웠습니다.","새로운 개념을 이해하는 데 시간이 걸리지만 차분히 배워가고 있습니다.","선생님과 함께 차근차근 연습하며 조금씩 발전하고 있습니다."]};
-const IMPROVE={vocabulary:["단어 암기에서 조금 어려움을 겪었는데, 매일 조금씩 반복하면 충분히 극복할 수 있습니다.","새로운 어휘를 외우는 데 시간이 더 필요해 보입니다. 학원에서 추가 복습 시간을 마련하겠습니다."],reading:["본문 내용을 읽고 이해하는 속도를 높이기 위해 추가 연습이 필요합니다.","문맥을 파악하는 능력을 기르기 위해 다양한 지문 연습을 할 예정입니다."],expression:["배운 표현을 실제로 활용하는 데 아직 익숙하지 않아 보입니다. 반복 연습을 통해 자연스러움을 기르겠습니다."],grammar:["문법 개념 중 일부에서 헷갈려하는 모습이 보였습니다. 관련 내용을 더 연습하겠습니다.","문장 구조를 파악하는 데 어려움이 있어, 기본 문형부터 차근차근 복습할 계획입니다."],general:["과제 완성도를 높이기 위해 시간 관리 방법을 함께 연습해 보겠습니다.","학습한 내용을 장기 기억으로 전환하기 위해 복습 주기를 조정할 예정입니다."]};
-const HOME={vocabulary:["오늘 배운 단어들을 하루에 3번씩 소리 내어 읽어보시면 암기에 큰 도움이 됩니다.","단어장을 활용하여 자기 전에 5분 정도 복습하는 습관을 들여주세요."],reading:["본문을 소리 내어 읽는 연습을 하루에 2-3회 해주시면 읽기 실력 향상에 효과적입니다."],expression:["오늘 배운 표현을 일상에서 사용해볼 수 있도록 격려해 주세요."],grammar:["오늘 배운 문법 내용을 활용하여 간단한 문장을 만들어보면 좋겠습니다.","문법 규칙을 직접 예문과 함께 정리해보는 연습을 권장드립니다."],encourage:["아이가 힘들어하거나 지칠 때는 따뜻한 격려의 말씀을 부탁드립니다.","작은 성취에도 칭찬해 주시면 학습 동기 부여에 큰 힘이 됩니다.","가정에서의 따뜻한 지지가 아이의 학습에 가장 큰 원동력이 됩니다."],general:["규칙적인 학습 시간을 정해두면 습관 형성에 도움이 됩니다.","학습 후 충분한 휴식을 취하면 배운 내용이 더 잘 정착됩니다."]};
+// 칭찬 템플릿
+const PRAISE = {
+    excellent: [
+        "{name} 학생이 오늘 수업에서 뛰어난 집중력과 적극적인 참여 태도를 보여주었습니다.",
+        "수업 시간 동안 높은 이해력을 바탕으로 학습 내용을 빠르게 습득하는 모습이 인상적이었습니다.",
+        "선생님의 질문에 자신감 있게 대답하며 수업에 능동적으로 참여하였습니다.",
+        "어려운 문제도 끝까지 포기하지 않고 도전하는 자세가 매우 훌륭하였습니다.",
+        "배운 내용을 정확히 이해하고 응용하는 능력이 탁월합니다."
+    ],
+    good: [
+        "{name} 학생이 오늘 수업에 성실한 자세로 참여하였습니다.",
+        "꾸준히 노력하는 모습이 눈에 띄며, 앞으로의 성장이 기대됩니다.",
+        "수업 내용을 이해하기 위해 집중하는 자세가 좋았습니다.",
+        "차분하게 문제를 풀어나가는 모습에서 학습에 대한 진지함이 느껴졌습니다."
+    ],
+    needs: [
+        "{name} 학생이 오늘 수업에서 최선을 다해 참여하였습니다.",
+        "새로운 개념을 익히는 데 시간이 걸리지만 포기하지 않는 모습이 대견합니다.",
+        "선생님과 함께 차근차근 연습하며 조금씩 발전해 나가고 있습니다."
+    ]
+};
 
-// 메모를 전문가 톤으로 변환하는 함수
-function polishText(text, type) {
-    if (!text) return '';
+// 개선점 템플릿
+const IMPROVE = {
+    vocabulary: [
+        "단어 암기 부분에서 조금 더 연습이 필요해 보입니다. 반복 학습을 통해 어휘력을 강화해 나가겠습니다.",
+        "새로운 어휘를 장기 기억으로 전환하는 훈련을 진행할 예정입니다."
+    ],
+    reading: [
+        "본문 독해 속도와 정확도를 높이기 위해 추가적인 읽기 연습을 진행하겠습니다.",
+        "지문의 핵심 내용을 파악하는 능력을 기르기 위해 다양한 유형의 텍스트로 연습할 계획입니다."
+    ],
+    expression: [
+        "배운 표현을 실제 상황에서 자연스럽게 활용할 수 있도록 반복 연습을 진행하겠습니다."
+    ],
+    grammar: [
+        "문법 개념의 정확한 이해와 적용을 위해 기초부터 체계적으로 복습해 나가겠습니다.",
+        "헷갈리기 쉬운 문법 포인트를 집중적으로 연습하여 실수를 줄여나갈 계획입니다."
+    ],
+    general: [
+        "학습한 내용을 장기 기억으로 정착시키기 위해 복습 주기를 조정하겠습니다.",
+        "수업 집중도를 높이기 위한 학습 환경 개선에 힘쓰겠습니다."
+    ]
+};
 
-    // 이미 문장형이면 그대로 반환
-    if (text.endsWith('습니다.') || text.endsWith('합니다.') || text.endsWith('됩니다.')) {
-        return text;
+// 가정학습 템플릿
+const HOME = {
+    vocabulary: [
+        "오늘 배운 단어들을 하루 3회 이상 소리 내어 읽어보시면 암기에 효과적입니다."
+    ],
+    reading: [
+        "본문을 소리 내어 읽는 연습을 매일 해주시면 읽기 유창성이 향상됩니다."
+    ],
+    expression: [
+        "배운 표현을 일상 대화에서 활용해볼 수 있도록 격려해 주세요."
+    ],
+    grammar: [
+        "오늘 배운 문법을 활용하여 간단한 문장을 직접 만들어보는 연습을 권장드립니다."
+    ],
+    encourage: [
+        "가정에서의 따뜻한 격려와 지지가 아이의 학습에 큰 힘이 됩니다.",
+        "작은 성취에도 칭찬해 주시면 학습 동기 부여에 효과적입니다.",
+        "꾸준한 학습이 가장 중요합니다. 아이의 페이스를 존중하며 응원해 주세요."
+    ],
+    general: [
+        "규칙적인 복습 시간을 정해두시면 학습 습관 형성에 도움이 됩니다."
+    ]
+};
+
+// 전문가 톤으로 변환하는 핵심 함수
+function transformToExpert(text, type, name) {
+    if (!text || text.trim() === '') return '';
+
+    let s = text.trim();
+
+    // 이미 전문가 톤이면 그대로 반환
+    if (s.endsWith('습니다.') || s.endsWith('합니다.') || s.endsWith('겠습니다.')) {
+        return s;
     }
 
-    let result = text.trim();
+    // 기본 정리
+    s = s.replace(/[.。,，]+$/, '');
+    s = s.replace(/^[-•·]\s*/, '');
 
-    // 끝 문자 정리
-    result = result.replace(/[.。]+$/, '');
-
-    // 칭찬 타입 변환
     if (type === 'praise') {
-        // "~함" → "~하였습니다"
-        if (result.endsWith('함')) {
-            result = result.slice(0, -1) + '하였습니다.';
-        }
-        // "~음" → "~습니다"
-        else if (result.endsWith('음')) {
-            result = result.slice(0, -1) + '습니다.';
-        }
-        // "~됨" → "~되었습니다"
-        else if (result.endsWith('됨')) {
-            result = result.slice(0, -1) + '되었습니다.';
-        }
-        // "~있음" → "~있습니다"
-        else if (result.endsWith('있음')) {
-            result = result.slice(0, -2) + '있습니다.';
-        }
-        // "훌륭함" → "훌륭하였습니다"
-        else if (result.includes('훌륭')) {
-            result = result.replace(/훌륭함?/, '매우 훌륭하였습니다');
-            if (!result.endsWith('.')) result += '.';
-        }
-        // 기타
-        else {
-            result += '의 모습을 보여주었습니다.';
+        // 칭찬 변환
+
+        // "이해도가 훌륭함" 패턴
+        if (s.includes('이해도') && s.includes('훌륭')) {
+            let topic = s.replace(/.*?(\S+(?:의|에 대한|에 대해)?)?\s*(?:구조와 해석에 대해|에 대해|에 대한)?\s*이해도가?\s*훌륭.*/, '$1').trim();
+            if (topic && topic.length > 1) {
+                return topic + ' 구조와 해석에 대한 이해도가 매우 뛰어났습니다. 개념을 정확히 파악하고 있어 앞으로의 학습이 더욱 기대됩니다.';
+            }
+            return '학습 내용에 대한 이해도가 매우 뛰어났습니다. 개념을 정확히 파악하고 있어 앞으로의 학습이 더욱 기대됩니다.';
         }
 
-        // "~에 대해" → "~에 대한"
-        result = result.replace(/에 대해 이해도가/, '에 대한 이해도가');
-        result = result.replace(/에 대해/, '에 대한');
-    }
-    // 개선점 타입 변환
-    else if (type === 'improve') {
-        // "다만, " 제거하고 문장 다듬기
-        result = result.replace(/^다만,?\s*/, '');
+        // "~완성해옴/완성해왔음" 패턴
+        if (s.includes('완성') && (s.includes('옴') || s.includes('왔'))) {
+            s = s.replace(/완성해\s*옴/, '완성해 왔습니다');
+            s = s.replace(/완성해\s*왔음/, '완성해 왔습니다');
+            if (!s.endsWith('.')) s += '.';
+            if (s.includes('숙제') || s.includes('과제')) {
+                s += ' 과제에 대한 책임감이 돋보이는 모습입니다.';
+            }
+            return s;
+        }
 
-        if (result.endsWith('있음')) {
-            result = result.slice(0, -2) + '있는 모습이 보였습니다. 이 부분은 반복 학습을 통해 보완해 나가겠습니다.';
+        // "~했음/~함" 일반 패턴
+        if (s.endsWith('했음')) {
+            return s.slice(0, -2) + '하였습니다. 이러한 노력이 실력 향상으로 이어질 것입니다.';
         }
-        else if (result.endsWith('함')) {
-            result = result.slice(0, -1) + '하는 경향이 있습니다. 학원에서 집중적으로 연습할 예정입니다.';
+        if (s.endsWith('함')) {
+            return s.slice(0, -1) + '하였습니다. 이러한 자세가 매우 바람직합니다.';
         }
-        else if (result.endsWith('음')) {
-            result = result.slice(0, -1) + '는 부분이 있습니다. 추가 지도를 통해 개선해 나가겠습니다.';
+        if (s.endsWith('음')) {
+            return s.slice(0, -1) + '습니다. 앞으로도 이 모습 그대로 꾸준히 노력해 주길 바랍니다.';
         }
-        else {
-            result += '는 부분에 대해 추가 연습이 필요합니다.';
+        if (s.endsWith('됨')) {
+            return s.slice(0, -1) + '되었습니다. 지속적인 발전이 기대됩니다.';
         }
-    }
-    // 가정학습 타입 변환
-    else if (type === 'home') {
-        result = result.replace(/^오늘\s*/, '');
 
-        if (result.endsWith('함')) {
-            result = '오늘 ' + result.slice(0, -1) + '하였습니다. 가정에서도 관련 내용을 복습해 주시면 학습 효과가 더욱 높아집니다.';
-        }
-        else if (result.endsWith('음')) {
-            result = '오늘 ' + result.slice(0, -1) + '습니다. 복습 시 참고 부탁드립니다.';
-        }
-        else if (result.endsWith('했음')) {
-            result = '오늘 ' + result.slice(0, -2) + '하였습니다. 해당 내용을 가정에서 한 번 더 확인해 주시면 좋겠습니다.';
-        }
-        else {
-            result = '오늘 ' + result + '에 대해 학습하였습니다. 관련 내용을 복습해 주시면 도움이 됩니다.';
-        }
+        return s + '하는 모습을 보여주었습니다. 앞으로도 이러한 자세를 유지해 주길 바랍니다.';
     }
 
-    return result;
+    if (type === 'improve') {
+        // 개선점 변환
+
+        // "다만" 제거
+        s = s.replace(/^다만,?\s*/, '');
+
+        // "혼동하고 있음" 패턴
+        if (s.includes('혼동') && s.includes('있음')) {
+            let topic = s.replace(/(.+?)[을를이가은는]\s*혼동.*/, '$1').trim();
+            if (topic && topic.length > 2) {
+                return topic + '을 구분하는 부분에서 다소 혼동이 있었습니다. 해당 내용은 유사한 개념들을 비교 정리하는 시간을 통해 명확히 구분할 수 있도록 지도하겠습니다.';
+            }
+            return '일부 개념을 구분하는 과정에서 혼동이 있었습니다. 반복 연습을 통해 정확하게 구분할 수 있도록 지도해 나가겠습니다.';
+        }
+
+        // "~어려워함/어려워했음" 패턴
+        if (s.includes('어려') && (s.includes('했음') || s.includes('함') || s.includes('워함'))) {
+            let topic = s.replace(/(.+?)[을를에서이가]\s*어려워.*/, '$1').trim();
+            if (topic && topic.length > 1) {
+                return topic + ' 부분에서 다소 어려움을 겪었습니다. 기초 개념부터 차근차근 복습하며 이해도를 높여 나가겠습니다.';
+            }
+            return '일부 내용에서 어려움을 겪는 모습이 보였습니다. 해당 부분을 집중적으로 보충 지도하겠습니다.';
+        }
+
+        // "~있음" 패턴
+        if (s.endsWith('있음')) {
+            return s.slice(0, -2) + '있는 부분이 관찰되었습니다. 이 부분은 추가 연습을 통해 보완해 나가겠습니다.';
+        }
+
+        // "~함" 패턴
+        if (s.endsWith('함')) {
+            return s.slice(0, -1) + '하는 경향이 있었습니다. 관련 내용을 집중적으로 복습하여 개선해 나가겠습니다.';
+        }
+
+        // "~음" 패턴
+        if (s.endsWith('음')) {
+            return s.slice(0, -1) + '는 부분이 있었습니다. 해당 영역에 대한 추가 지도를 진행하겠습니다.';
+        }
+
+        return s + ' 부분에 대해 보충 학습을 진행할 예정입니다.';
+    }
+
+    if (type === 'home') {
+        // 가정학습 변환
+
+        // "오늘" 제거
+        s = s.replace(/^오늘\s*/, '');
+
+        // "~학습함/배움" 패턴
+        if (s.includes('학습') || s.includes('배') || s.includes('연습')) {
+            let topic = '';
+
+            // "~에 대해 학습함" 패턴
+            let match = s.match(/(.+?)\s*(?:에 대해|을|를)?\s*학습/);
+            if (match) topic = match[1];
+
+            if (!topic) {
+                match = s.match(/(.+?)\s*(?:을|를)?\s*배/);
+                if (match) topic = match[1];
+            }
+
+            if (topic && topic.length > 1) {
+                topic = topic.replace(/^오늘\s*/, '');
+                return '오늘 수업에서는 ' + topic + '에 대해 학습하였습니다. 가정에서 해당 내용을 한 번 더 복습해 주시면 학습 효과가 배가됩니다.';
+            }
+
+            return '오늘 배운 내용을 가정에서 복습해 주시면 학습 효과가 높아집니다.';
+        }
+
+        // "포인트/집중" 패턴
+        if (s.includes('포인트') || s.includes('집중')) {
+            return '오늘 학습한 핵심 포인트를 가정에서 다시 한번 확인해 주시면 좋겠습니다.';
+        }
+
+        // 일반 패턴
+        if (s.endsWith('했음')) {
+            return '오늘 ' + s.slice(0, -2) + '하였습니다. 관련 내용을 가정에서 복습해 주시면 도움이 됩니다.';
+        }
+        if (s.endsWith('함')) {
+            return '오늘 ' + s.slice(0, -1) + '하였습니다. 가정에서도 꾸준히 연습해 주시면 실력 향상에 큰 도움이 됩니다.';
+        }
+        if (s.endsWith('음')) {
+            return '오늘 ' + s.slice(0, -1) + '습니다. 해당 내용을 복습해 주시면 좋겠습니다.';
+        }
+
+        return '오늘 ' + s + '에 대해 학습하였습니다. 복습 부탁드립니다.';
+    }
+
+    return s;
 }
 
-function parseInput(text){
-    let d={name:'',textbook:'',progress:'',homework:'',vocabulary:'',reading:'',expression:'',grammar:'',test:'',notes:''};
-    let lines=text.split('\n');
-    let notes=[];
+function parseInput(text) {
+    let d = {name:'', textbook:'', progress:'', homework:'', vocabulary:'', reading:'', expression:'', grammar:'', test:'', notes:''};
+    let lines = text.split('\n');
+    let notes = [];
 
-    for(let line of lines){
-        line=line.trim();
-        if(!line)continue;
+    for (let line of lines) {
+        line = line.trim();
+        if (!line) continue;
 
-        let lower=line.toLowerCase();
-        if(lower.startsWith('학생이름')||lower.startsWith('학생 이름')||lower.startsWith('이름')){
-            d.name=line.split(/\s+/).slice(1).join(' ').trim();
-        }else if(lower.startsWith('교재')){
-            d.textbook=line.split(/\s+/).slice(1).join(' ').trim();
-        }else if(lower.startsWith('진도')){
-            d.progress=line.split(/\s+/).slice(1).join(' ').trim();
-        }else if(lower.startsWith('과제')){
-            let val=line.split(/\s+/).slice(1).join(' ').trim();
-            if(val.includes('완료'))d.homework=val.includes('부분')?'부분완료':val.includes('미')?'미완료':'완료';
-        }else if(lower.startsWith('단어')){
-            d.vocabulary=line.split(/\s+/).slice(1).join(' ').trim().toUpperCase();
-        }else if(lower.startsWith('본문')){
-            d.reading=line.split(/\s+/).slice(1).join(' ').trim().toUpperCase();
-        }else if(lower.startsWith('표현')){
-            d.expression=line.split(/\s+/).slice(1).join(' ').trim().toUpperCase();
-        }else if(lower.startsWith('문법')){
-            d.grammar=line.split(/\s+/).slice(1).join(' ').trim().toUpperCase();
-        }else if(lower.startsWith('테스트')){
-            d.test=line.split(/\s+/).slice(1).join(' ').trim().toUpperCase();
-        }else{
+        let lower = line.toLowerCase();
+        if (lower.startsWith('학생이름') || lower.startsWith('학생 이름') || lower.startsWith('이름')) {
+            d.name = line.split(/\s+/).slice(1).join(' ').trim();
+        } else if (lower.startsWith('교재')) {
+            d.textbook = line.split(/\s+/).slice(1).join(' ').trim();
+        } else if (lower.startsWith('진도')) {
+            d.progress = line.split(/\s+/).slice(1).join(' ').trim();
+        } else if (lower.startsWith('과제')) {
+            let val = line.split(/\s+/).slice(1).join(' ').trim();
+            if (val.includes('완료')) d.homework = val.includes('부분') ? '부분완료' : val.includes('미') ? '미완료' : '완료';
+        } else if (lower.startsWith('단어')) {
+            d.vocabulary = line.split(/\s+/).slice(1).join(' ').trim().toUpperCase();
+        } else if (lower.startsWith('본문')) {
+            d.reading = line.split(/\s+/).slice(1).join(' ').trim().toUpperCase();
+        } else if (lower.startsWith('표현')) {
+            d.expression = line.split(/\s+/).slice(1).join(' ').trim().toUpperCase();
+        } else if (lower.startsWith('문법')) {
+            d.grammar = line.split(/\s+/).slice(1).join(' ').trim().toUpperCase();
+        } else if (lower.startsWith('테스트')) {
+            d.test = line.split(/\s+/).slice(1).join(' ').trim().toUpperCase();
+        } else {
             notes.push(line);
         }
     }
-    d.notes=notes.join('\n');
+    d.notes = notes.join('\n');
     return d;
 }
 
-function getEval(g){if(['A','A+'].includes(g))return'우수';if(['B','B+'].includes(g))return'보통';if(g)return'미흡';return'';}
-function pick(arr,n){return[...arr].sort(()=>0.5-Math.random()).slice(0,n);}
-function getLevel(d){let g=[];['vocabulary','reading','expression','grammar','test'].forEach(k=>{if(d[k]){if(['A','A+'].includes(d[k]))g.push(3);else if(['B','B+'].includes(d[k]))g.push(2);else g.push(1);}});if(!g.length)return'good';let a=g.reduce((x,y)=>x+y,0)/g.length;if(a>=2.5)return'excellent';if(a>=1.5)return'good';return'needs';}
+function getEval(g) {
+    if (['A', 'A+'].includes(g)) return '우수';
+    if (['B', 'B+'].includes(g)) return '보통';
+    if (g) return '미흡';
+    return '';
+}
 
-function generateReport(){
-    let input=document.getElementById('inputText').value.trim();
-    if(!input){alert('학생 정보를 입력해주세요.');return;}
+function pick(arr, n) {
+    return [...arr].sort(() => 0.5 - Math.random()).slice(0, n);
+}
 
-    let d=parseInput(input);
-    if(!d.name){alert('학생 이름을 입력해주세요.\n예: 학생이름 홍길동');return;}
-    if(!d.textbook){alert('교재를 입력해주세요.\n예: 교재 Orange 8');return;}
-    if(!d.progress){alert('진도를 입력해주세요.\n예: 진도 Day 7');return;}
+function getLevel(d) {
+    let g = [];
+    ['vocabulary', 'reading', 'expression', 'grammar', 'test'].forEach(k => {
+        if (d[k]) {
+            if (['A', 'A+'].includes(d[k])) g.push(3);
+            else if (['B', 'B+'].includes(d[k])) g.push(2);
+            else g.push(1);
+        }
+    });
+    if (!g.length) return 'good';
+    let a = g.reduce((x, y) => x + y, 0) / g.length;
+    if (a >= 2.5) return 'excellent';
+    if (a >= 1.5) return 'good';
+    return 'needs';
+}
 
-    let r=[],i=1;
-    r.push(d.name+' 학생 Daily Study Report 보내드립니다','','교재 및 진도 현황','사용 교재: '+d.textbook,'학습 진도: '+d.progress,'','학습 평가 결과','');
+function generateReport() {
+    let input = document.getElementById('inputText').value.trim();
+    if (!input) { alert('학생 정보를 입력해주세요.'); return; }
 
-    if(d.homework){r.push(i+'. 과제수행 완성도');if(d.homework==='완료')r.push('(O) 완료 / ( ) 미완료 / ( ) 부분완료');else if(d.homework==='미완료')r.push('( ) 완료 / (O) 미완료 / ( ) 부분완료');else r.push('( ) 완료 / ( ) 미완료 / (O) 부분완료');r.push('');i++;}
-    if(d.vocabulary){r.push(i+'. 단어 테스트 결과','등급: '+d.vocabulary,'평가: '+getEval(d.vocabulary),'');i++;}
-    if(d.reading){r.push(i+'. 본문 테스트 결과','등급: '+d.reading,'평가: '+getEval(d.reading),'');i++;}
-    if(d.expression){r.push(i+'. 표현확장연습 결과','등급: '+d.expression,'평가: '+getEval(d.expression),'');i++;}
-    if(d.grammar){r.push(i+'. 문법 테스트 결과','등급: '+d.grammar,'평가: '+getEval(d.grammar),'');i++;}
-    if(d.test){r.push(i+'. 전체 테스트 결과','등급: '+d.test,'평가: '+getEval(d.test),'');}
+    let d = parseInput(input);
+    if (!d.name) { alert('학생 이름을 입력해주세요.'); return; }
+    if (!d.textbook) { alert('교재를 입력해주세요.'); return; }
+    if (!d.progress) { alert('진도를 입력해주세요.'); return; }
+
+    let r = [], i = 1;
+    r.push(d.name + ' 학생 Daily Study Report 보내드립니다', '', '교재 및 진도 현황', '사용 교재: ' + d.textbook, '학습 진도: ' + d.progress, '', '학습 평가 결과', '');
+
+    if (d.homework) {
+        r.push(i + '. 과제수행 완성도');
+        if (d.homework === '완료') r.push('(O) 완료 / ( ) 미완료 / ( ) 부분완료');
+        else if (d.homework === '미완료') r.push('( ) 완료 / (O) 미완료 / ( ) 부분완료');
+        else r.push('( ) 완료 / ( ) 미완료 / (O) 부분완료');
+        r.push(''); i++;
+    }
+    if (d.vocabulary) { r.push(i + '. 단어 테스트 결과', '등급: ' + d.vocabulary, '평가: ' + getEval(d.vocabulary), ''); i++; }
+    if (d.reading) { r.push(i + '. 본문 테스트 결과', '등급: ' + d.reading, '평가: ' + getEval(d.reading), ''); i++; }
+    if (d.expression) { r.push(i + '. 표현확장연습 결과', '등급: ' + d.expression, '평가: ' + getEval(d.expression), ''); i++; }
+    if (d.grammar) { r.push(i + '. 문법 테스트 결과', '등급: ' + d.grammar, '평가: ' + getEval(d.grammar), ''); i++; }
+    if (d.test) { r.push(i + '. 전체 테스트 결과', '등급: ' + d.test, '평가: ' + getEval(d.test), ''); }
 
     // 칭찬할 점
-    let lv=getLevel(d);
-    let praise=pick(PRAISE[lv],3).map(x=>x.replace('{name}',d.name)).join(' ');
+    let lv = getLevel(d);
+    let praiseArr = pick(PRAISE[lv], 3).map(x => x.replace('{name}', d.name));
 
-    // 긍정적인 특이사항 추가 (전문가 톤으로 변환)
-    if(d.notes){
-        let posLines=d.notes.split('\n').filter(l=>/열심히|잘|좋|적극|발전|향상|훌륭|이해도|완성/.test(l)&&!/다만|혼동|어려/.test(l));
-        if(posLines.length){
-            let polished = polishText(posLines[0], 'praise');
-            praise+=' 특히, '+polished;
+    // 긍정적 특이사항 추가
+    if (d.notes) {
+        let posLines = d.notes.split('\n').filter(l =>
+            /열심히|잘|좋|적극|발전|향상|훌륭|이해도|완성|뛰어|우수/.test(l) &&
+            !/다만|혼동|어려|부족/.test(l)
+        );
+        if (posLines.length > 0) {
+            let transformed = transformToExpert(posLines[0], 'praise', d.name);
+            praiseArr.push(transformed);
         }
     }
-    r.push('칭찬할 점',praise,'');
+    r.push('칭찬할 점', praiseArr.join(' '), '');
 
     // 개선이 필요한 부분
-    let areas=[];
-    if(d.vocabulary&&getEval(d.vocabulary)!=='우수')areas.push('vocabulary');
-    if(d.reading&&getEval(d.reading)!=='우수')areas.push('reading');
-    if(d.expression&&getEval(d.expression)!=='우수')areas.push('expression');
-    if(d.grammar&&getEval(d.grammar)!=='우수')areas.push('grammar');
-    if(!areas.length)areas=['general'];
+    let areas = [];
+    if (d.vocabulary && getEval(d.vocabulary) !== '우수') areas.push('vocabulary');
+    if (d.reading && getEval(d.reading) !== '우수') areas.push('reading');
+    if (d.expression && getEval(d.expression) !== '우수') areas.push('expression');
+    if (d.grammar && getEval(d.grammar) !== '우수') areas.push('grammar');
+    if (!areas.length) areas = ['general'];
 
-    let imp=[];
-    areas.slice(0,2).forEach(a=>{if(IMPROVE[a])imp.push(...pick(IMPROVE[a],1));});
-    if(imp.length<2)imp.push(...pick(IMPROVE.general,1));
-    let impText=imp.join(' ');
+    let impArr = [];
+    areas.slice(0, 2).forEach(a => { if (IMPROVE[a]) impArr.push(...pick(IMPROVE[a], 1)); });
+    if (impArr.length < 1) impArr.push(...pick(IMPROVE.general, 1));
 
-    // 개선점 특이사항 추가 (전문가 톤으로 변환)
-    if(d.notes){
-        let negLines=d.notes.split('\n').filter(l=>/어려|힘들|부족|실수|헷갈|혼동|다만/.test(l));
-        if(negLines.length){
-            let polished = polishText(negLines[0], 'improve');
-            impText+=' '+polished;
+    // 개선점 특이사항 추가
+    if (d.notes) {
+        let negLines = d.notes.split('\n').filter(l => /어려|힘들|부족|실수|헷갈|혼동|다만/.test(l));
+        if (negLines.length > 0) {
+            let transformed = transformToExpert(negLines[0], 'improve', d.name);
+            impArr.push(transformed);
         }
     }
-    r.push('개선이 필요한 부분',impText,'');
+    r.push('개선이 필요한 부분', impArr.join(' '), '');
 
     // 가정에서의 학습 제안
-    let home=[];
-    areas.slice(0,2).forEach(a=>{if(HOME[a])home.push(...pick(HOME[a],1));});
-    home.push(...pick(HOME.encourage,1));
-    if(home.length<3)home.push(...pick(HOME.general,1));
+    let homeArr = [];
+    areas.slice(0, 1).forEach(a => { if (HOME[a]) homeArr.push(...pick(HOME[a], 1)); });
+    homeArr.push(...pick(HOME.encourage, 1));
 
-    // 학습 내용 특이사항 추가 (전문가 톤으로 변환)
-    if(d.notes){
-        let studyLines=d.notes.split('\n').filter(l=>/학습함|배움|배웠|연습|포인트|집중/.test(l));
-        if(studyLines.length){
-            let polished = polishText(studyLines[0], 'home');
-            home.push(polished);
+    // 학습 내용 특이사항 추가
+    if (d.notes) {
+        let studyLines = d.notes.split('\n').filter(l => /학습|배움|배웠|연습|포인트|집중/.test(l) && !/다만|혼동|어려/.test(l));
+        if (studyLines.length > 0) {
+            let transformed = transformToExpert(studyLines[0], 'home', d.name);
+            homeArr.push(transformed);
         }
     }
+    r.push('가정에서의 학습 제안', homeArr.join(' '));
 
-    r.push('가정에서의 학습 제안',home.join(' '));
-
-    document.getElementById('reportOutput').value=r.join('\n');
+    document.getElementById('reportOutput').value = r.join('\n');
     document.getElementById('resultSection').classList.add('show');
 }
 
-function copyReport(){
-    let t=document.getElementById('reportOutput').value;
-    navigator.clipboard.writeText(t).then(()=>{
-        let n=document.getElementById('copyNotice');
+function copyReport() {
+    let t = document.getElementById('reportOutput').value;
+    navigator.clipboard.writeText(t).then(() => {
+        let n = document.getElementById('copyNotice');
         n.classList.add('show');
-        setTimeout(()=>n.classList.remove('show'),2000);
-    }).catch(()=>{
+        setTimeout(() => n.classList.remove('show'), 2000);
+    }).catch(() => {
         document.getElementById('reportOutput').select();
         document.execCommand('copy');
-        let n=document.getElementById('copyNotice');
+        let n = document.getElementById('copyNotice');
         n.classList.add('show');
-        setTimeout(()=>n.classList.remove('show'),2000);
+        setTimeout(() => n.classList.remove('show'), 2000);
     });
 }
 
-function clearAll(){
-    document.getElementById('inputText').value='';
-    document.getElementById('reportOutput').value='';
+function clearAll() {
+    document.getElementById('inputText').value = '';
+    document.getElementById('reportOutput').value = '';
     document.getElementById('resultSection').classList.remove('show');
 }
 </script>
