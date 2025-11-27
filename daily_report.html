@@ -116,6 +116,11 @@ const IMPROVE = {
     general: [
         "학습한 내용을 장기 기억으로 정착시키기 위해 복습 주기를 조정하겠습니다.",
         "수업 집중도를 높이기 위한 학습 환경 개선에 힘쓰겠습니다."
+    ],
+    excellent: [
+        "현재 학습 성과가 매우 우수합니다. 이 수준을 꾸준히 유지할 수 있도록 지도해 나가겠습니다.",
+        "뛰어난 성적을 거두고 있으나 자만하지 않고 겸손한 자세로 학습에 임할 수 있도록 격려하겠습니다.",
+        "우수한 실력을 바탕으로 더 높은 수준의 학습에 도전할 수 있도록 심화 내용을 준비하겠습니다."
     ]
 };
 
@@ -136,10 +141,18 @@ const HOME = {
     encourage: [
         "가정에서의 따뜻한 격려와 지지가 아이의 학습에 큰 힘이 됩니다.",
         "작은 성취에도 칭찬해 주시면 학습 동기 부여에 효과적입니다.",
-        "꾸준한 학습이 가장 중요합니다. 아이의 페이스를 존중하며 응원해 주세요."
+        "꾸준한 학습이 가장 중요합니다. 아이의 페이스를 존중하며 응원해 주세요.",
+        "아이가 힘들어하거나 지칠 때는 따뜻한 격려의 말씀을 부탁드립니다."
     ],
     general: [
-        "규칙적인 복습 시간을 정해두시면 학습 습관 형성에 도움이 됩니다."
+        "규칙적인 복습 시간을 정해두시면 학습 습관 형성에 도움이 됩니다.",
+        "하루 10분씩이라도 꾸준히 영어에 노출되면 실력 향상에 큰 도움이 됩니다.",
+        "복습 시 어려운 부분이 있으면 체크해 두셨다가 다음 수업 때 질문하도록 지도해 주세요."
+    ],
+    excellent: [
+        "우수한 성적을 유지하기 위해 현재의 학습 습관을 꾸준히 이어가시길 권장드립니다.",
+        "잘하고 있다는 격려의 말씀을 자주 해주시면 아이의 자신감 향상에 도움이 됩니다.",
+        "심화 학습에 관심이 있으시면 말씀해 주세요. 추가 학습 자료를 안내해 드리겠습니다."
     ]
 };
 
@@ -150,7 +163,7 @@ function transformToExpert(text, type, name) {
     let s = text.trim();
 
     // 이미 전문가 톤이면 그대로 반환
-    if (s.endsWith('습니다.') || s.endsWith('합니다.') || s.endsWith('겠습니다.')) {
+    if (s.endsWith('습니다.') || s.endsWith('합니다.') || s.endsWith('겠습니다.') || s.endsWith('바랍니다.')) {
         return s;
     }
 
@@ -170,6 +183,16 @@ function transformToExpert(text, type, name) {
             return '학습 내용에 대한 이해도가 매우 뛰어났습니다. 개념을 정확히 파악하고 있어 앞으로의 학습이 더욱 기대됩니다.';
         }
 
+        // "마무리 했음/마무리했음" 패턴
+        if (s.includes('마무리') && (s.includes('했음') || s.includes('함'))) {
+            // 핵심 내용 추출
+            let content = s.replace(/특히,?\s*/, '').replace(/마무리\s*했음.*$/, '').replace(/마무리\s*함.*$/, '').trim();
+            if (content.length > 5) {
+                return content + ' 마무리하였습니다. 학습에 대한 성실한 태도가 돋보입니다.';
+            }
+            return '오늘 학습 내용을 훌륭하게 마무리하였습니다. 꾸준한 노력이 좋은 결과로 이어지고 있습니다.';
+        }
+
         // "~완성해옴/완성해왔음" 패턴
         if (s.includes('완성') && (s.includes('옴') || s.includes('왔'))) {
             s = s.replace(/완성해\s*옴/, '완성해 왔습니다');
@@ -181,13 +204,19 @@ function transformToExpert(text, type, name) {
             return s;
         }
 
-        // "~했음/~함" 일반 패턴
-        if (s.endsWith('했음')) {
-            return s.slice(0, -2) + '하였습니다. 이러한 노력이 실력 향상으로 이어질 것입니다.';
+        // "~했음" 일반 패턴 (마지막에서 찾기)
+        let match = s.match(/(.+)\s*했음$/);
+        if (match) {
+            return match[1].trim() + '하였습니다. 이러한 노력이 실력 향상으로 이어질 것입니다.';
         }
-        if (s.endsWith('함')) {
-            return s.slice(0, -1) + '하였습니다. 이러한 자세가 매우 바람직합니다.';
+
+        // "~함" 일반 패턴
+        match = s.match(/(.+)\s*함$/);
+        if (match) {
+            return match[1].trim() + '하였습니다. 이러한 자세가 매우 바람직합니다.';
         }
+
+        // "~음" 일반 패턴
         if (s.endsWith('음')) {
             return s.slice(0, -1) + '습니다. 앞으로도 이 모습 그대로 꾸준히 노력해 주길 바랍니다.';
         }
@@ -244,6 +273,7 @@ function transformToExpert(text, type, name) {
         // 가정학습 변환
 
         // "오늘" 제거
+        let originalS = s;
         s = s.replace(/^오늘\s*/, '');
 
         // "~학습함/배움" 패턴
@@ -272,13 +302,19 @@ function transformToExpert(text, type, name) {
             return '오늘 학습한 핵심 포인트를 가정에서 다시 한번 확인해 주시면 좋겠습니다.';
         }
 
-        // 일반 패턴
-        if (s.endsWith('했음')) {
-            return '오늘 ' + s.slice(0, -2) + '하였습니다. 관련 내용을 가정에서 복습해 주시면 도움이 됩니다.';
+        // "~했음" 패턴
+        let match = s.match(/(.+)\s*했음$/);
+        if (match) {
+            return '오늘 ' + match[1].trim() + '하였습니다. 관련 내용을 가정에서 복습해 주시면 도움이 됩니다.';
         }
-        if (s.endsWith('함')) {
-            return '오늘 ' + s.slice(0, -1) + '하였습니다. 가정에서도 꾸준히 연습해 주시면 실력 향상에 큰 도움이 됩니다.';
+
+        // "~함" 패턴
+        match = s.match(/(.+)\s*함$/);
+        if (match) {
+            return '오늘 ' + match[1].trim() + '하였습니다. 가정에서도 꾸준히 연습해 주시면 실력 향상에 큰 도움이 됩니다.';
         }
+
+        // "~음" 패턴
         if (s.endsWith('음')) {
             return '오늘 ' + s.slice(0, -1) + '습니다. 해당 내용을 복습해 주시면 좋겠습니다.';
         }
@@ -287,6 +323,18 @@ function transformToExpert(text, type, name) {
     }
 
     return s;
+}
+
+// 중복 제거 함수
+function removeDuplicates(arr) {
+    let seen = new Set();
+    return arr.filter(item => {
+        // 문장의 핵심 부분만 추출하여 비교 (앞 30자)
+        let key = item.substring(0, 30);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
 }
 
 function parseInput(text) {
@@ -385,7 +433,7 @@ function generateReport() {
     // 긍정적 특이사항 추가
     if (d.notes) {
         let posLines = d.notes.split('\n').filter(l =>
-            /열심히|잘|좋|적극|발전|향상|훌륭|이해도|완성|뛰어|우수/.test(l) &&
+            /열심히|잘|좋|적극|발전|향상|훌륭|이해도|완성|뛰어|우수|마무리/.test(l) &&
             !/다만|혼동|어려|부족/.test(l)
         );
         if (posLines.length > 0) {
@@ -393,6 +441,8 @@ function generateReport() {
             praiseArr.push(transformed);
         }
     }
+    // 중복 제거 후 출력
+    praiseArr = removeDuplicates(praiseArr);
     r.push('칭찬할 점', praiseArr.join(' '), '');
 
     // 개선이 필요한 부분
@@ -401,11 +451,14 @@ function generateReport() {
     if (d.reading && getEval(d.reading) !== '우수') areas.push('reading');
     if (d.expression && getEval(d.expression) !== '우수') areas.push('expression');
     if (d.grammar && getEval(d.grammar) !== '우수') areas.push('grammar');
-    if (!areas.length) areas = ['general'];
+
+    // 성적이 모두 우수하면 excellent 카테고리 사용
+    let allExcellent = areas.length === 0;
+    if (allExcellent) areas = ['excellent'];
 
     let impArr = [];
     areas.slice(0, 2).forEach(a => { if (IMPROVE[a]) impArr.push(...pick(IMPROVE[a], 1)); });
-    if (impArr.length < 1) impArr.push(...pick(IMPROVE.general, 1));
+    if (impArr.length < 1) impArr.push(...pick(IMPROVE.excellent, 1));
 
     // 개선점 특이사항 추가
     if (d.notes) {
@@ -415,21 +468,33 @@ function generateReport() {
             impArr.push(transformed);
         }
     }
+    // 중복 제거 후 출력
+    impArr = removeDuplicates(impArr);
     r.push('개선이 필요한 부분', impArr.join(' '), '');
 
     // 가정에서의 학습 제안
     let homeArr = [];
-    areas.slice(0, 1).forEach(a => { if (HOME[a]) homeArr.push(...pick(HOME[a], 1)); });
-    homeArr.push(...pick(HOME.encourage, 1));
 
-    // 학습 내용 특이사항 추가
+    // 학습 내용 특이사항을 먼저 추가 (문장 순서 개선)
+    let studyTransformed = '';
     if (d.notes) {
         let studyLines = d.notes.split('\n').filter(l => /학습|배움|배웠|연습|포인트|집중/.test(l) && !/다만|혼동|어려/.test(l));
         if (studyLines.length > 0) {
-            let transformed = transformToExpert(studyLines[0], 'home', d.name);
-            homeArr.push(transformed);
+            studyTransformed = transformToExpert(studyLines[0], 'home', d.name);
+            homeArr.push(studyTransformed);
         }
     }
+
+    // 성적이 모두 우수하면 excellent 카테고리 사용
+    if (allExcellent) {
+        homeArr.push(...pick(HOME.excellent, 1));
+    } else {
+        areas.slice(0, 1).forEach(a => { if (HOME[a]) homeArr.push(...pick(HOME[a], 1)); });
+    }
+    homeArr.push(...pick(HOME.encourage, 1));
+
+    // 중복 제거 후 출력
+    homeArr = removeDuplicates(homeArr);
     r.push('가정에서의 학습 제안', homeArr.join(' '));
 
     document.getElementById('reportOutput').value = r.join('\n');
