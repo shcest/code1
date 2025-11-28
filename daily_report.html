@@ -156,75 +156,88 @@ const HOME = {
     ]
 };
 
-// 전문가 톤으로 변환하는 핵심 함수
+// 전문가 톤으로 변환하는 핵심 함수 - 입력 내용을 반드시 전문가 문체로 변환
 function transformToExpert(text, type, name) {
     if (!text || text.trim() === '') return '';
 
     let s = text.trim();
 
-    // 이미 전문가 톤이면 그대로 반환
-    if (s.endsWith('습니다.') || s.endsWith('합니다.') || s.endsWith('겠습니다.') || s.endsWith('바랍니다.')) {
+    // 이미 완벽한 전문가 톤이면 그대로 반환
+    if (s.endsWith('습니다.') && s.length > 20) {
         return s;
     }
 
     // 기본 정리
     s = s.replace(/[.。,，]+$/, '');
     s = s.replace(/^[-•·]\s*/, '');
+    s = s.replace(/^특히,?\s*/, '');
+
+    // 메모식 어미를 전문가 어미로 변환하는 헬퍼 함수
+    function convertEnding(str) {
+        str = str.replace(/했음$/, '했습니다');
+        str = str.replace(/됐음$/, '되었습니다');
+        str = str.replace(/됨$/, '되었습니다');
+        str = str.replace(/있음$/, '있습니다');
+        str = str.replace(/없음$/, '없습니다');
+        str = str.replace(/였음$/, '였습니다');
+        str = str.replace(/봄$/, '봤습니다');
+        str = str.replace(/옴$/, '왔습니다');
+        str = str.replace(/감$/, '갔습니다');
+        str = str.replace(/냄$/, '냈습니다');
+        str = str.replace(/줌$/, '줬습니다');
+        str = str.replace(/좋음$/, '좋습니다');
+        str = str.replace(/나쁨$/, '나쁩니다');
+        str = str.replace(/많음$/, '많습니다');
+        str = str.replace(/적음$/, '적습니다');
+        // ~ㅁ 으로 끝나는 일반적인 경우
+        if (str.endsWith('함')) str = str.slice(0, -1) + '합니다';
+        if (str.endsWith('음') && !str.endsWith('습니다')) str = str.slice(0, -1) + '습니다';
+        return str;
+    }
 
     if (type === 'praise') {
         // 칭찬 변환
 
         // "이해도가 훌륭함" 패턴
-        if (s.includes('이해도') && s.includes('훌륭')) {
-            let topic = s.replace(/.*?(\S+(?:의|에 대한|에 대해)?)?\s*(?:구조와 해석에 대해|에 대해|에 대한)?\s*이해도가?\s*훌륭.*/, '$1').trim();
+        if (s.includes('이해도') && (s.includes('훌륭') || s.includes('뛰어') || s.includes('좋'))) {
+            let match = s.match(/(.+?)(?:의|에 대한|에 대해)?\s*(?:구조와 해석에 대해|에 대해|에 대한)?\s*이해도/);
+            let topic = match ? match[1].trim() : '';
             if (topic && topic.length > 1) {
-                return topic + ' 구조와 해석에 대한 이해도가 매우 뛰어났습니다. 개념을 정확히 파악하고 있어 앞으로의 학습이 더욱 기대됩니다.';
+                return topic + '에 대한 이해도가 매우 뛰어났습니다. 개념을 정확히 파악하고 있어 앞으로의 학습이 더욱 기대됩니다.';
             }
             return '학습 내용에 대한 이해도가 매우 뛰어났습니다. 개념을 정확히 파악하고 있어 앞으로의 학습이 더욱 기대됩니다.';
         }
 
-        // "마무리 했음/마무리했음" 패턴
-        if (s.includes('마무리') && (s.includes('했음') || s.includes('함'))) {
-            // 핵심 내용 추출
-            let content = s.replace(/특히,?\s*/, '').replace(/마무리\s*했음.*$/, '').replace(/마무리\s*함.*$/, '').trim();
-            if (content.length > 5) {
-                return content + ' 마무리했습니다. 학습에 대한 성실한 태도가 돋보입니다.';
+        // "마무리" 패턴
+        if (s.includes('마무리')) {
+            let content = s.replace(/마무리\s*(했음|함|잘|를)?.*$/, '').replace(/잘\s*$/, '').trim();
+            if (content.length > 3) {
+                return content + ' 내용을 훌륭하게 마무리했습니다. 학습에 대한 성실한 태도가 돋보입니다.';
             }
             return '오늘 학습 내용을 훌륭하게 마무리했습니다. 꾸준한 노력이 좋은 결과로 이어지고 있습니다.';
         }
 
-        // "~완성해옴/완성해왔음" 패턴
-        if (s.includes('완성') && (s.includes('옴') || s.includes('왔'))) {
-            s = s.replace(/완성해\s*옴/, '완성해 왔습니다');
-            s = s.replace(/완성해\s*왔음/, '완성해 왔습니다');
-            if (!s.endsWith('.')) s += '.';
-            if (s.includes('숙제') || s.includes('과제')) {
-                s += ' 과제에 대한 책임감이 돋보이는 모습입니다.';
+        // "완성" 패턴
+        if (s.includes('완성')) {
+            return '과제를 성실하게 완성해 왔습니다. 책임감 있는 학습 태도가 돋보입니다.';
+        }
+
+        // "잘" 패턴
+        if (s.includes('잘')) {
+            let converted = convertEnding(s);
+            if (converted !== s) {
+                return converted + ' 이러한 모습이 매우 인상적이었습니다.';
             }
-            return s;
         }
 
-        // "~했음" 일반 패턴 (마지막에서 찾기)
-        let match = s.match(/(.+)\s*했음$/);
-        if (match) {
-            return match[1].trim() + '했습니다. 이러한 노력이 실력 향상으로 이어질 것입니다.';
+        // 일반 메모식 어미 변환
+        let converted = convertEnding(s);
+        if (converted !== s && converted.endsWith('습니다')) {
+            return converted + ' 앞으로도 이러한 자세를 유지해 주길 바랍니다.';
         }
 
-        // "~함" 일반 패턴
-        match = s.match(/(.+)\s*함$/);
-        if (match) {
-            return match[1].trim() + '했습니다. 이러한 자세가 매우 바람직합니다.';
-        }
-
-        // "~음" 일반 패턴
-        if (s.endsWith('음')) {
-            return s.slice(0, -1) + '습니다. 앞으로도 이 모습 그대로 꾸준히 노력해 주길 바랍니다.';
-        }
-        if (s.endsWith('됨')) {
-            return s.slice(0, -1) + '되었습니다. 지속적인 발전이 기대됩니다.';
-        }
-
-        return s + '하는 모습을 보여주었습니다. 앞으로도 이러한 자세를 유지해 주길 바랍니다.';
+        // 그 외 모든 경우 - 원본을 사용하지 않고 새로운 문장 생성
+        return '수업에 성실히 참여하며 ' + s.replace(/했음|함|음|됨$/g, '') + '하는 모습을 보여주었습니다. 앞으로의 성장이 기대됩니다.';
     }
 
     if (type === 'improve') {
@@ -233,68 +246,86 @@ function transformToExpert(text, type, name) {
         // "다만" 제거
         s = s.replace(/^다만,?\s*/, '');
 
-        // "혼동하고 있음" 패턴
-        if (s.includes('혼동') && s.includes('있음')) {
-            let topic = s.replace(/(.+?)[을를이가은는]\s*혼동.*/, '$1').trim();
+        // "혼동" 패턴
+        if (s.includes('혼동')) {
+            let match = s.match(/(.+?)[을를이가은는만]\s*혼동/);
+            let topic = match ? match[1].trim() : '';
             if (topic && topic.length > 2) {
                 return topic + '을 구분하는 부분에서 다소 혼동이 있었습니다. 해당 내용은 유사한 개념들을 비교 정리하는 시간을 통해 명확히 구분할 수 있도록 지도하겠습니다.';
             }
             return '일부 개념을 구분하는 과정에서 혼동이 있었습니다. 반복 연습을 통해 정확하게 구분할 수 있도록 지도해 나가겠습니다.';
         }
 
-        // "~어려워함/어려워했음" 패턴
-        if (s.includes('어려') && (s.includes('했음') || s.includes('함') || s.includes('워함'))) {
-            let topic = s.replace(/(.+?)[을를에서이가]\s*어려워.*/, '$1').trim();
+        // "어려" 패턴
+        if (s.includes('어려')) {
+            let match = s.match(/(.+?)[을를에서이가]\s*어려/);
+            let topic = match ? match[1].trim() : '';
             if (topic && topic.length > 1) {
                 return topic + ' 부분에서 다소 어려움을 겪었습니다. 기초 개념부터 차근차근 복습하며 이해도를 높여 나가겠습니다.';
             }
             return '일부 내용에서 어려움을 겪는 모습이 보였습니다. 해당 부분을 집중적으로 보충 지도하겠습니다.';
         }
 
-        // "~있음" 패턴
-        if (s.endsWith('있음')) {
-            return s.slice(0, -2) + '있는 부분이 관찰되었습니다. 이 부분은 추가 연습을 통해 보완해 나가겠습니다.';
+        // "헷갈" 패턴
+        if (s.includes('헷갈')) {
+            let match = s.match(/(.+?)[을를이가에서]\s*헷갈/);
+            let topic = match ? match[1].trim() : '';
+            if (topic && topic.length > 1) {
+                return topic + ' 부분에서 다소 헷갈려하는 모습이 있었습니다. 추가 설명과 반복 연습을 통해 확실히 이해할 수 있도록 지도하겠습니다.';
+            }
+            return '일부 개념에서 헷갈려하는 모습이 있었습니다. 명확히 구분할 수 있도록 보충 지도하겠습니다.';
         }
 
-        // "~함" 패턴
-        if (s.endsWith('함')) {
-            return s.slice(0, -1) + '하는 경향이 있었습니다. 관련 내용을 집중적으로 복습하여 개선해 나가겠습니다.';
+        // "부족" 패턴
+        if (s.includes('부족')) {
+            let match = s.match(/(.+?)[이가에]\s*부족/);
+            let topic = match ? match[1].trim() : '';
+            if (topic && topic.length > 1) {
+                return topic + ' 부분이 조금 부족한 모습이 보였습니다. 해당 영역을 집중적으로 보완해 나가겠습니다.';
+            }
+            return '일부 영역에서 보완이 필요한 부분이 있었습니다. 집중 지도를 통해 개선해 나가겠습니다.';
         }
 
-        // "~음" 패턴
-        if (s.endsWith('음')) {
-            return s.slice(0, -1) + '는 부분이 있었습니다. 해당 영역에 대한 추가 지도를 진행하겠습니다.';
+        // 일반 메모식 어미 변환
+        let converted = convertEnding(s);
+        if (converted !== s && converted.endsWith('습니다')) {
+            return converted + ' 해당 부분은 추가 연습을 통해 보완해 나가겠습니다.';
         }
 
-        return s + ' 부분에 대해 보충 학습을 진행할 예정입니다.';
+        // 그 외 모든 경우
+        return s.replace(/했음|함|음|됨|있음$/g, '') + ' 부분에 대해 추가적인 지도를 진행할 예정입니다.';
     }
 
     if (type === 'home') {
         // 가정학습 변환
 
         // "오늘" 제거
-        let originalS = s;
         s = s.replace(/^오늘\s*/, '');
 
-        // "~학습함/배움" 패턴
-        if (s.includes('학습') || s.includes('배') || s.includes('연습')) {
-            let topic = '';
-
-            // "~에 대해 학습함" 패턴
-            let match = s.match(/(.+?)\s*(?:에 대해|을|를)?\s*학습/);
-            if (match) topic = match[1];
+        // "학습/배움/연습" 패턴
+        if (s.includes('학습') || s.includes('배웠') || s.includes('배움')) {
+            let match = s.match(/(.+?)\s*(?:에 대해|에 대한|을|를)?\s*학습/);
+            let topic = match ? match[1].trim() : '';
 
             if (!topic) {
                 match = s.match(/(.+?)\s*(?:을|를)?\s*배/);
-                if (match) topic = match[1];
+                topic = match ? match[1].trim() : '';
             }
 
             if (topic && topic.length > 1) {
                 topic = topic.replace(/^오늘\s*/, '');
                 return '오늘 수업에서는 ' + topic + '에 대해 학습했습니다. 가정에서 해당 내용을 한 번 더 복습해 주시면 학습 효과가 배가됩니다.';
             }
-
             return '오늘 배운 내용을 가정에서 복습해 주시면 학습 효과가 높아집니다.';
+        }
+
+        // "연습" 패턴
+        if (s.includes('연습')) {
+            let match = s.match(/(.+?)\s*(?:을|를)?\s*연습/);
+            let topic = match ? match[1].trim() : '';
+            if (topic && topic.length > 1) {
+                return '오늘 ' + topic + ' 연습을 진행했습니다. 가정에서도 꾸준히 연습해 주시면 실력 향상에 큰 도움이 됩니다.';
+            }
         }
 
         // "포인트/집중" 패턴
@@ -302,24 +333,15 @@ function transformToExpert(text, type, name) {
             return '오늘 학습한 핵심 포인트를 가정에서 다시 한번 확인해 주시면 좋겠습니다.';
         }
 
-        // "~했음" 패턴
-        let match = s.match(/(.+)\s*했음$/);
-        if (match) {
-            return '오늘 ' + match[1].trim() + '했습니다. 관련 내용을 가정에서 복습해 주시면 도움이 됩니다.';
+        // 일반 메모식 어미 변환
+        let converted = convertEnding(s);
+        if (converted !== s && converted.endsWith('습니다')) {
+            return '오늘 ' + converted + ' 가정에서 복습해 주시면 학습 효과가 높아집니다.';
         }
 
-        // "~함" 패턴
-        match = s.match(/(.+)\s*함$/);
-        if (match) {
-            return '오늘 ' + match[1].trim() + '했습니다. 가정에서도 꾸준히 연습해 주시면 실력 향상에 큰 도움이 됩니다.';
-        }
-
-        // "~음" 패턴
-        if (s.endsWith('음')) {
-            return '오늘 ' + s.slice(0, -1) + '습니다. 해당 내용을 복습해 주시면 좋겠습니다.';
-        }
-
-        return '오늘 ' + s + '에 대해 학습했습니다. 복습 부탁드립니다.';
+        // 그 외 모든 경우
+        let cleanText = s.replace(/했음|함|음|됨$/g, '').trim();
+        return '오늘 ' + cleanText + '에 대해 학습했습니다. 가정에서 복습해 주시면 좋겠습니다.';
     }
 
     return s;
